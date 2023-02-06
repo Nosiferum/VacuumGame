@@ -63,6 +63,11 @@ void UTP_WeaponComponent::Fire()
 	}
 }
 
+void UTP_WeaponComponent::Vacuum()
+{
+	UE_LOG(LogTemp, Display, TEXT("Vacuum"));
+}
+
 void UTP_WeaponComponent::AttachWeapon(AVacuumGameCharacter* TargetCharacter)
 {
 	Character = TargetCharacter;
@@ -91,6 +96,7 @@ void UTP_WeaponComponent::AttachWeapon(AVacuumGameCharacter* TargetCharacter)
 		{
 			// Fire
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
+			EnhancedInputComponent->BindAction(VacuumAction, ETriggerEvent::Ongoing, this, &UTP_WeaponComponent::Vacuum);
 		}
 	}
 }
