@@ -61,6 +61,12 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
+	UPROPERTY(EditAnywhere, Category="Vacuuming")
+	float VacuumingDistance = 300.f;
+	UPROPERTY(EditAnywhere, Category="Vacuuming")
+	float VacuumRadius = 60.f;
 	/** The Character holding this weapon*/
 	AVacuumGameCharacter* Character;
+	FVector Start;
+	FVector End;
 };

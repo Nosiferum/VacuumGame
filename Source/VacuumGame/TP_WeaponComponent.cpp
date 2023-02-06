@@ -65,7 +65,25 @@ void UTP_WeaponComponent::Fire()
 
 void UTP_WeaponComponent::Vacuum()
 {
-	UE_LOG(LogTemp, Display, TEXT("Vacuum"));
+	TArray<FHitResult> OutHits;
+	Start = GetComponentLocation();
+	End = Start + GetRightVector() * VacuumingDistance;
+
+	if (GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(VacuumRadius)))
+	{
+		for (int i = 0; i < OutHits.Num(); i++)
+		{
+			FVector OtherActorLocation = OutHits[i].GetActor()->GetActorLocation();
+			FVector ComponentLocation = GetComponentLocation();
+			FVector NewLocation = FMath::VInterpConstantTo(OtherActorLocation, ComponentLocation, UGameplayStatics::GetWorldDeltaSeconds(this), 60.f);
+			OutHits[i].GetActor()->SetActorLocation(NewLocation);
+			//UE_LOG(LogTemp, Display, TEXT("Vacuum"));
+			
+		}
+		
+	}
+	
+	DrawDebugSphere(GetWorld(), End, VacuumRadius, 10, FColor::Blue, false, 5);
 }
 
 void UTP_WeaponComponent::AttachWeapon(AVacuumGameCharacter* TargetCharacter)
