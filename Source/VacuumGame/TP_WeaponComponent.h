@@ -65,6 +65,8 @@ private:
 	float VacuumingDistance = 300.f;
 	UPROPERTY(EditAnywhere, Category="Vacuuming")
 	float VacuumRadius = 60.f;
+	UPROPERTY(EditAnywhere, Category="Vacuuming")
+	float InterpolationSpeed = 10.f;
 	/** The Character holding this weapon*/
 	AVacuumGameCharacter* Character;
 	FVector Start;

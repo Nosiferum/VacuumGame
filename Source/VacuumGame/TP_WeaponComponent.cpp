@@ -73,11 +73,19 @@ void UTP_WeaponComponent::Vacuum()
 	{
 		for (int i = 0; i < OutHits.Num(); i++)
 		{
-			FVector OtherActorLocation = OutHits[i].GetActor()->GetActorLocation();
-			FVector ComponentLocation = GetComponentLocation();
-			FVector NewLocation = FMath::VInterpConstantTo(OtherActorLocation, ComponentLocation, UGameplayStatics::GetWorldDeltaSeconds(this), 60.f);
-			OutHits[i].GetActor()->SetActorLocation(NewLocation);
-			//UE_LOG(LogTemp, Display, TEXT("Vacuum"));
+			AActor* OtherActor =  OutHits[i].GetActor();
+			FVector OtherActorLocation = OtherActor->GetActorLocation();
+			FVector OtherActorScale = OtherActor->GetActorScale();
+			FVector MuzzleLocation = Start + FVector(0,0,10.f) + GetRightVector() * 50.f ;
+			
+			//FVector NewLocation = FMath::VInterpConstantTo(OtherActorLocation, ComponentLocation, UGameplayStatics::GetWorldDeltaSeconds(this), 60.f);
+			FVector NewVacuumLocation = FMath::VInterpTo(OtherActorLocation, MuzzleLocation, UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed);
+			FVector NewVacuumScale = FMath::VInterpTo(OtherActorScale, FVector(0.01f,0.01f, 0.01f),
+				UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed * 2.f);
+			
+			OtherActor->SetActorScale3D(NewVacuumScale);
+			OtherActor->SetActorLocation(NewVacuumLocation);
+			//UE_LOG(LogTemp, Display, TEXT("%f, %f, %f"), NewVacuumLocation.X, NewVacuumLocation.Y, NewVacuumLocation.Z);
 			
 		}
 		
