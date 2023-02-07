@@ -28,7 +28,7 @@ void UTP_WeaponComponent::Fire()
 	// Try and fire a projectile
 	if (ProjectileClass != nullptr)
 	{
-		UWorld* const World = GetWorld();
+		//UWorld* const World = GetWorld();
 		if (World != nullptr)
 		{
 			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
@@ -69,29 +69,68 @@ void UTP_WeaponComponent::Vacuum()
 	Start = GetComponentLocation();
 	End = Start + GetRightVector() * VacuumingDistance;
 
-	if (GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(VacuumRadius)))
+	if (World->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(VacuumRadius)))
 	{
 		for (int i = 0; i < OutHits.Num(); i++)
 		{
 			AActor* OtherActor =  OutHits[i].GetActor();
+			UPrimitiveComponent* OtherActorPrimitiveComponent = OtherActor->FindComponentByClass<UPrimitiveComponent>();
 			FVector OtherActorLocation = OtherActor->GetActorLocation();
 			FVector OtherActorScale = OtherActor->GetActorScale();
 			FVector MuzzleLocation = Start + FVector(0,0,10.f) + GetRightVector() * 50.f ;
+
+			if (OtherActorPrimitiveComponent)
+				OtherActorPrimitiveComponent->SetSimulatePhysics(false);
+
+			if (OtherActor)
+			{
+				//FVector NewLocation = FMath::VInterpConstantTo(OtherActorLocation, ComponentLocation, UGameplayStatics::GetWorldDeltaSeconds(this), 60.f);
+				FVector NewVacuumLocation = FMath::VInterpTo(OtherActorLocation, MuzzleLocation, UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed);
+				FVector NewVacuumScale = FMath::VInterpTo(OtherActorScale, FVector(0.01f,0.01f, 0.01f),
+					UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed * ShrinkingSpeed);
 			
-			//FVector NewLocation = FMath::VInterpConstantTo(OtherActorLocation, ComponentLocation, UGameplayStatics::GetWorldDeltaSeconds(this), 60.f);
-			FVector NewVacuumLocation = FMath::VInterpTo(OtherActorLocation, MuzzleLocation, UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed);
-			FVector NewVacuumScale = FMath::VInterpTo(OtherActorScale, FVector(0.01f,0.01f, 0.01f),
-				UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed * 2.f);
+				OtherActor->SetActorScale3D(NewVacuumScale);
+				OtherActor->SetActorLocation(NewVacuumLocation);
+				//UE_LOG(LogTemp, Display, TEXT("%f, %f, %f"), NewVacuumLocation.X, NewVacuumLocation.Y, NewVacuumLocation.Z);
+
+				if (OtherActor->GetActorScale().X <= SuckingValue)
+				{
+					Ammo.Add(OtherActor);
+					//UE_LOG(LogTemp, Display, TEXT("gucuk"));
+					/*OtherActor->SetActorHiddenInGame(true);
+					OtherActor->SetActorTickEnabled(false);
+					OtherActor->DisableComponentsSimulatePhysics();*/
+					OtherActor->Destroy();
+				}
+
+			}
 			
-			OtherActor->SetActorScale3D(NewVacuumScale);
-			OtherActor->SetActorLocation(NewVacuumLocation);
-			//UE_LOG(LogTemp, Display, TEXT("%f, %f, %f"), NewVacuumLocation.X, NewVacuumLocation.Y, NewVacuumLocation.Z);
-			
+			if(OtherActorPrimitiveComponent)
+			{
+				OtherActorPrimitiveComponent->SetSimulatePhysics(true);
+				OtherActorPrimitiveComponent->WakeAllRigidBodies();
+			}
 		}
-		
 	}
 	
-	DrawDebugSphere(GetWorld(), End, VacuumRadius, 10, FColor::Blue, false, 5);
+	DrawDebugSphere(World, End, VacuumRadius, 10, FColor::Blue, false, 5);
+}
+
+void UTP_WeaponComponent::VacuumFire()
+{
+		if (Ammo.Num() > 0)
+		{
+			AActor* VacuumedActor = Ammo.Pop();
+			/*FActorSpawnParameters SpawnParameters;
+			SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;*/
+			
+			if (World->SpawnActor<AActor>(VacuumedActor->GetClass(), GetComponentLocation() + GetRightVector() * 200.f, FRotator(FQuat::Identity)) == nullptr)
+			{
+				UE_LOG(LogTemp, Display, TEXT("Bos"));
+				Ammo.Add(VacuumedActor);
+				UE_LOG(LogTemp, Display, TEXT("%s"), *VacuumedActor->GetName());
+			}
+		}
 }
 
 void UTP_WeaponComponent::AttachWeapon(AVacuumGameCharacter* TargetCharacter)
@@ -121,10 +160,17 @@ void UTP_WeaponComponent::AttachWeapon(AVacuumGameCharacter* TargetCharacter)
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// Fire
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
+			//EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::VacuumFire);
 			EnhancedInputComponent->BindAction(VacuumAction, ETriggerEvent::Ongoing, this, &UTP_WeaponComponent::Vacuum);
 		}
 	}
+}
+
+void UTP_WeaponComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	World = GetWorld();
 }
 
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

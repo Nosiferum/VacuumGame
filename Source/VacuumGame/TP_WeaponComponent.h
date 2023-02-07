@@ -52,13 +52,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
 
-	UFUNCTION(BlueprintCallable, Category="Weapon")
+	
 	void Vacuum();
+	void VacuumFire();
 
 protected:
 	/** Ends gameplay for this component. */
 	UFUNCTION()
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void BeginPlay() override;
 
 private:
 	UPROPERTY(EditAnywhere, Category="Vacuuming")
@@ -67,8 +69,14 @@ private:
 	float VacuumRadius = 60.f;
 	UPROPERTY(EditAnywhere, Category="Vacuuming")
 	float InterpolationSpeed = 10.f;
+	UPROPERTY(EditAnywhere, Category="Vacuuming")
+	float SuckingValue = 0.2f;
+	UPROPERTY(EditAnywhere, Category="Vacuuming")
+	float ShrinkingSpeed = 2.f;
 	/** The Character holding this weapon*/
 	AVacuumGameCharacter* Character;
+	UWorld* World;
 	FVector Start;
 	FVector End;
+	TArray<AActor*> Ammo;
 };
