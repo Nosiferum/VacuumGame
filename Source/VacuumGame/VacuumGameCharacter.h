@@ -14,6 +14,7 @@ class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnAmmoChanged, int32, TotalAmmo);
 UCLASS(config=Game)
 class AVacuumGameCharacter : public ACharacter
 {
@@ -39,6 +40,8 @@ class AVacuumGameCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* MoveAction;
 
+public:
+	FOnAmmoChanged OnAmmoChanged;
 	
 public:
 	AVacuumGameCharacter();
@@ -81,7 +84,6 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
-
+	
 };
 

@@ -73,6 +73,8 @@ private:
 	float SuckingValue = 0.2f;
 	UPROPERTY(EditAnywhere, Category="Vacuuming")
 	float ShrinkingSpeed = 2.f;
+	UPROPERTY(EditAnywhere, Category="Vacuuming")
+	float ShrinkingValue = 0.1f;
 	/** The Character holding this weapon*/
 	AVacuumGameCharacter* Character;
 	UWorld* World;

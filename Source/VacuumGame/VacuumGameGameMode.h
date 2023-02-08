@@ -13,6 +13,15 @@ class AVacuumGameGameMode : public AGameModeBase
 
 public:
 	AVacuumGameGameMode();
+
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnAmmoChanged(int32 Ammo);
+
+	virtual void BeginPlay() override;
+
+private:
+	class AVacuumGameCharacter* Character;
 };
 
 
