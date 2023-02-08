@@ -111,13 +111,11 @@ void UTP_WeaponComponent::Vacuum()
 			if (Distance <= 130.f)
 			{
 				Ammo.Add(OtherActor);
-				//UE_LOG(LogTemp, Display, TEXT("gucuk"));
 				/*OtherActor->SetActorHiddenInGame(true);
 				OtherActor->SetActorTickEnabled(false);
 				OtherActor->DisableComponentsSimulatePhysics();*/
 
 				Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
-				//OnAmmoChanged.Execute(Ammo.Num());
 				
 				OtherActor->Destroy();
 			}
@@ -139,17 +137,17 @@ void UTP_WeaponComponent::VacuumFire()
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;*/
 
 		Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
-		//OnAmmoChanged.Execute(Ammo.Num());
+		
 		/*AActor* SpawnedActor = World->SpawnActor<AActor>(VacuumedActor->GetClass(), GetComponentLocation() + GetRightVector() * 200.f,
 									  FRotator(FQuat::Identity));*/
 		AActor* SpawnedActor = World->SpawnActor<AActor>(VacuumedActor->GetClass(), GetComponentLocation() + GetRightVector() * 200.f,
 									  GetComponentRotation());
+
+		SpawnedActor->SetOwner(GetOwner());
 		
 		if (SpawnedActor == nullptr)
 		{
-			//UE_LOG(LogTemp, Display, TEXT("Bos"));
 			Ammo.Add(VacuumedActor);
-			//UE_LOG(LogTemp, Display, TEXT("%s"), *VacuumedActor->GetName());
 			Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
 		}
 
