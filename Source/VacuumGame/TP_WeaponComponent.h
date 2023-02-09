@@ -76,6 +76,15 @@ private:
 	float ShrinkingSpeed = 2.f;
 	UPROPERTY(EditAnywhere, Category="Vacuuming")
 	float ShrinkingValue = 0.1f;
+	UPROPERTY(EditAnywhere, Category="Vacuuming")
+	float ShrinkingThreshold = 145.f;
+	UPROPERTY(EditAnywhere, Category="Vacuuming")
+	float DestructionThreshold = 130.f;
+	UPROPERTY(EditAnywhere, Category="Firing")
+	float ProjectileSpawnLocationCoefficient = 200.f;
+	UPROPERTY(EditAnywhere, Category="Firing")
+	float ProjectileImpulseCoefficient = 3000.f;
+	
 	/** The Character holding this weapon*/
 	AVacuumGameCharacter* Character;
 	UWorld* World;

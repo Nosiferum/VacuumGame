@@ -37,7 +37,10 @@ void AVacuumableObject::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAc
 	const TSubclassOf<UDamageType> DamageTypeClass = UDamageType::StaticClass();
 
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner && OtherActor->ActorHasTag("Enemy"))
+	{
 		UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwnerInstigator, this, DamageTypeClass);
+		HitComponent->AddImpulseAtLocation(GetVelocity() * 2.f, GetActorLocation());
+	}
 }
 
 // Called every frame

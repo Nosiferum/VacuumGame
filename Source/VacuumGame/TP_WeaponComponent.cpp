@@ -83,7 +83,7 @@ void UTP_WeaponComponent::Vacuum()
 			FVector MuzzleLocation = Start + FVector(0, 0, 10.f) + GetRightVector() * 50.f;
 
 			float Distance = FVector::Dist(OtherActorLocation, MuzzleLocation);
-			
+
 			OtherActorPrimitiveComponent->SetSimulatePhysics(false);
 
 			FVector NewVacuumLocation = FMath::VInterpTo(OtherActorLocation, MuzzleLocation,
@@ -92,7 +92,7 @@ void UTP_WeaponComponent::Vacuum()
 
 			OtherActor->SetActorLocation(NewVacuumLocation);
 
-			if (Distance <= 145.f)
+			if (Distance <= ShrinkingThreshold)
 			{
 				FVector NewVacuumScale = FMath::VInterpTo(OtherActorScale,
 				                                          FVector(ShrinkingValue, ShrinkingValue, ShrinkingValue),
@@ -101,8 +101,8 @@ void UTP_WeaponComponent::Vacuum()
 
 				OtherActor->SetActorScale3D(NewVacuumScale);
 			}
-			
-			if (Distance <= 130.f)
+
+			if (Distance <= DestructionThreshold)
 			{
 				Ammo.Add(OtherActor);
 				Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
@@ -110,7 +110,7 @@ void UTP_WeaponComponent::Vacuum()
 			}
 		}
 	}
-	
+
 	//DrawDebugSphere(World, End, VacuumRadius, 10, FColor::Blue, false, 5);
 }
 
@@ -125,7 +125,8 @@ void UTP_WeaponComponent::VacuumFire()
 		Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
 
 		AActor* SpawnedActor = World->SpawnActor<AActor>(VacuumedActor->GetClass(),
-		                                                 GetComponentLocation() + GetRightVector() * 200.f,
+		                                                 GetComponentLocation() + GetRightVector() *
+		                                                 ProjectileSpawnLocationCoefficient,
 		                                                 GetComponentRotation());
 
 		SpawnedActor->SetOwner(GetOwner());
@@ -142,7 +143,7 @@ void UTP_WeaponComponent::VacuumFire()
 
 			if (StaticMeshComponent)
 				StaticMeshComponent->AddImpulse(
-					SpawnedActor->GetActorForwardVector() * 1000.f * StaticMeshComponent->GetMass());
+					SpawnedActor->GetActorForwardVector() * ProjectileImpulseCoefficient * StaticMeshComponent->GetMass());
 		}
 	}
 }
@@ -160,11 +161,11 @@ void UTP_WeaponComponent::PushBackCanceledVacuumedObjects()
 		{
 			AActor* OtherActor = OutHits[i].GetActor();
 			UPrimitiveComponent* OtherActorPrimitiveComponent = OtherActor->FindComponentByClass<UPrimitiveComponent>();
-			
+
 			if (OtherActorPrimitiveComponent)
 			{
 				OtherActorPrimitiveComponent->SetSimulatePhysics(true);
-				OtherActor->SetActorScale3D(FVector(1,1,1));
+				OtherActor->SetActorScale3D(FVector(1, 1, 1));
 			}
 		}
 	}
