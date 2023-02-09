@@ -44,7 +44,10 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 		EnemyCharacter->OnHealthChanged();
 	
 	if (Health <= 0.f)
+	{
+		OnActorDied.Broadcast();
 		Owner->Destroy();
+	}
 }
 
 

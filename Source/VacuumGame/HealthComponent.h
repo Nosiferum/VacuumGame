@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealthChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnActorDied);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VACUUMGAME_API UHealthComponent : public UActorComponent
@@ -16,10 +16,9 @@ class VACUUMGAME_API UHealthComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
-
-	/*UPROPERTY(BlueprintCallable, BlueprintAssignable, VisibleAnywhere)
-	FOnHealthChanged OnHealthChanged;*/
 	
+	FOnActorDied OnActorDied;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

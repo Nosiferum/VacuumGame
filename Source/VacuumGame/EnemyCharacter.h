@@ -22,11 +22,29 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable)
+	void HandleHitFX();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
+private:
+	UFUNCTION()
+	void HandleDeath();
+
+private:
+	UPROPERTY(EditAnywhere, Category="Combat")
+	UParticleSystem* DeathParticles;
+	UPROPERTY(EditAnywhere, Category="Combat")
+	UParticleSystem* HitParticles;
+	UPROPERTY(EditAnywhere, Category="Combat")
+	USoundBase* DeathSound;
+	UPROPERTY(EditAnywhere, Category="Combat")
+	USoundBase* HitSound;
+
+	class UHealthComponent* HealthComponent;
 };
