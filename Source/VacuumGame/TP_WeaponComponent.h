@@ -55,6 +55,7 @@ public:
 	
 	void Vacuum();
 	void VacuumFire();
+	void PushBackCanceledVacuumedObjects();
 
 protected:
 	/** Ends gameplay for this component. */

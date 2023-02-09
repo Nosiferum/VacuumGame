@@ -15,6 +15,7 @@ class UAnimMontage;
 class USoundBase;
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnAmmoChanged, int32, TotalAmmo);
+
 UCLASS(config=Game)
 class AVacuumGameCharacter : public ACharacter
 {

@@ -3,6 +3,9 @@
 
 #include "HealthComponent.h"
 
+#include "EnemyCharacter.h"
+#include "Components/WidgetComponent.h"
+
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
 {
@@ -17,9 +20,11 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Health = MaxHealth;
-
 	Owner = GetOwner();
-	Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
+	EnemyCharacter = Cast<AEnemyCharacter>(Owner);
+
+	if (Owner)
+		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
 }
 
 // Called every frame
@@ -34,9 +39,10 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 	if (Damage <= 0.f) return;
 
 	Health -= Damage;
-
-	UE_LOG(LogTemp, Warning, TEXT("%f"), Health);
-
+	
+	if (EnemyCharacter)
+		EnemyCharacter->OnHealthChanged();
+	
 	if (Health <= 0.f)
 		Owner->Destroy();
 }

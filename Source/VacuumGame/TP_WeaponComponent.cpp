@@ -83,9 +83,7 @@ void UTP_WeaponComponent::Vacuum()
 			FVector MuzzleLocation = Start + FVector(0, 0, 10.f) + GetRightVector() * 50.f;
 
 			float Distance = FVector::Dist(OtherActorLocation, MuzzleLocation);
-
-			//UE_LOG(LogTemp, Display, TEXT("%f"), Distance);
-
+			
 			OtherActorPrimitiveComponent->SetSimulatePhysics(false);
 
 			FVector NewVacuumLocation = FMath::VInterpTo(OtherActorLocation, MuzzleLocation,
@@ -94,7 +92,7 @@ void UTP_WeaponComponent::Vacuum()
 
 			OtherActor->SetActorLocation(NewVacuumLocation);
 
-			if (Distance <= 160.f)
+			if (Distance <= 145.f)
 			{
 				FVector NewVacuumScale = FMath::VInterpTo(OtherActorScale,
 				                                          FVector(ShrinkingValue, ShrinkingValue, ShrinkingValue),
@@ -103,29 +101,17 @@ void UTP_WeaponComponent::Vacuum()
 
 				OtherActor->SetActorScale3D(NewVacuumScale);
 			}
-
-
-			//UE_LOG(LogTemp, Display, TEXT("%f, %f, %f"), NewVacuumLocation.X, NewVacuumLocation.Y, NewVacuumLocation.Z);
-
-			//if (OtherActor->GetActorScale().X <= SuckingValue)
+			
 			if (Distance <= 130.f)
 			{
 				Ammo.Add(OtherActor);
-				/*OtherActor->SetActorHiddenInGame(true);
-				OtherActor->SetActorTickEnabled(false);
-				OtherActor->DisableComponentsSimulatePhysics();*/
-
 				Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
-				
 				OtherActor->Destroy();
 			}
-
-			OtherActorPrimitiveComponent->SetSimulatePhysics(true);
-			OtherActorPrimitiveComponent->WakeAllRigidBodies();
 		}
 	}
-
-	DrawDebugSphere(World, End, VacuumRadius, 10, FColor::Blue, false, 5);
+	
+	//DrawDebugSphere(World, End, VacuumRadius, 10, FColor::Blue, false, 5);
 }
 
 void UTP_WeaponComponent::VacuumFire()
@@ -137,14 +123,13 @@ void UTP_WeaponComponent::VacuumFire()
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;*/
 
 		Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
-		
-		/*AActor* SpawnedActor = World->SpawnActor<AActor>(VacuumedActor->GetClass(), GetComponentLocation() + GetRightVector() * 200.f,
-									  FRotator(FQuat::Identity));*/
-		AActor* SpawnedActor = World->SpawnActor<AActor>(VacuumedActor->GetClass(), GetComponentLocation() + GetRightVector() * 200.f,
-									  GetComponentRotation());
+
+		AActor* SpawnedActor = World->SpawnActor<AActor>(VacuumedActor->GetClass(),
+		                                                 GetComponentLocation() + GetRightVector() * 200.f,
+		                                                 GetComponentRotation());
 
 		SpawnedActor->SetOwner(GetOwner());
-		
+
 		if (SpawnedActor == nullptr)
 		{
 			Ammo.Add(VacuumedActor);
@@ -153,30 +138,34 @@ void UTP_WeaponComponent::VacuumFire()
 
 		else
 		{
-			UProjectileMovementComponent* ProjectileMovementComponent = SpawnedActor->FindComponentByClass<UProjectileMovementComponent>();
 			UStaticMeshComponent* StaticMeshComponent = SpawnedActor->FindComponentByClass<UStaticMeshComponent>();
 
-			/*StaticMeshComponent->AddImpulse(ProjectileMovementComponent->GetOwner()->GetActorForwardVector() * 1000.f);
-			StaticMeshComponent->AddForce(ProjectileMovementComponent->GetOwner()->GetActorForwardVector() * 1000.f);*/
+			if (StaticMeshComponent)
+				StaticMeshComponent->AddImpulse(
+					SpawnedActor->GetActorForwardVector() * 1000.f * StaticMeshComponent->GetMass());
+		}
+	}
+}
+
+void UTP_WeaponComponent::PushBackCanceledVacuumedObjects()
+{
+	TArray<FHitResult> OutHits;
+	Start = GetComponentLocation();
+	End = Start + GetRightVector() * VacuumingDistance;
+
+	if (World->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_GameTraceChannel2,
+	                               FCollisionShape::MakeSphere(VacuumRadius)))
+	{
+		for (int i = 0; i < OutHits.Num(); i++)
+		{
+			AActor* OtherActor = OutHits[i].GetActor();
+			UPrimitiveComponent* OtherActorPrimitiveComponent = OtherActor->FindComponentByClass<UPrimitiveComponent>();
 			
-			if (ProjectileMovementComponent)
+			if (OtherActorPrimitiveComponent)
 			{
-				ProjectileMovementComponent->InitialSpeed = 1000;
-				
-				UE_LOG(LogTemp, Display, TEXT("Bos"));
-				
-				ProjectileMovementComponent->AddRadialImpulse(SpawnedActor->GetActorRightVector(), 100.f, 10000.f,
-														  ERadialImpulseFalloff::RIF_Constant, true);
-				
+				OtherActorPrimitiveComponent->SetSimulatePhysics(true);
+				OtherActor->SetActorScale3D(FVector(1,1,1));
 			}
-
-			/*if (StaticMeshComponent)
-			{
-				UE_LOG(LogTemp, Display, TEXT("Bos"));
-				StaticMeshComponent->AddImpulse(GetRightVector() * 1000.f);
-			}*/
-
-			
 		}
 	}
 }
@@ -215,6 +204,8 @@ void UTP_WeaponComponent::AttachWeapon(AVacuumGameCharacter* TargetCharacter)
 			                                   &UTP_WeaponComponent::VacuumFire);
 			EnhancedInputComponent->BindAction(VacuumAction, ETriggerEvent::Ongoing, this,
 			                                   &UTP_WeaponComponent::Vacuum);
+			EnhancedInputComponent->BindAction(VacuumAction, ETriggerEvent::Canceled, this,
+			                                   &UTP_WeaponComponent::PushBackCanceledVacuumedObjects);
 		}
 	}
 }
