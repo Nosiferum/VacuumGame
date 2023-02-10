@@ -80,6 +80,8 @@ private:
 	float ShrinkingThreshold = 145.f;
 	UPROPERTY(EditAnywhere, Category="Vacuuming")
 	float DestructionThreshold = 130.f;
+	UPROPERTY(EditAnywhere, Category="Vacuuming FX")
+	UParticleSystem* VacuumParticles;
 	UPROPERTY(EditAnywhere, Category="Firing")
 	float ProjectileSpawnLocationCoefficient = 200.f;
 	UPROPERTY(EditAnywhere, Category="Firing")

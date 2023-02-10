@@ -13,5 +13,7 @@ UCLASS()
 class VACUUMGAME_API AVacuumAIController : public AAIController
 {
 	GENERATED_BODY()
-	
+
+protected:
+	virtual void BeginPlay() override;
 };

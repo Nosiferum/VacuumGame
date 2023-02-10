@@ -18,7 +18,6 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 }
 
-
 void UTP_WeaponComponent::Fire()
 {
 	if (Character == nullptr || Character->GetController() == nullptr)
@@ -77,15 +76,12 @@ void UTP_WeaponComponent::Vacuum()
 		for (int i = 0; i < OutHits.Num(); i++)
 		{
 			AActor* OtherActor = OutHits[i].GetActor();
-			UPrimitiveComponent* OtherActorPrimitiveComponent = OtherActor->FindComponentByClass<UPrimitiveComponent>();
 			FVector OtherActorLocation = OtherActor->GetActorLocation();
 			FVector OtherActorScale = OtherActor->GetActorScale();
 			FVector MuzzleLocation = Start + FVector(0, 0, 10.f) + GetRightVector() * 50.f;
 
 			float Distance = FVector::Dist(OtherActorLocation, MuzzleLocation);
-
-			OtherActorPrimitiveComponent->SetSimulatePhysics(false);
-
+			
 			FVector NewVacuumLocation = FMath::VInterpTo(OtherActorLocation, MuzzleLocation,
 			                                             UGameplayStatics::GetWorldDeltaSeconds(this),
 			                                             InterpolationSpeed);
@@ -106,6 +102,16 @@ void UTP_WeaponComponent::Vacuum()
 			{
 				Ammo.Add(OtherActor);
 				Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
+				
+				if (VacuumParticles)
+				{
+					UE_LOG(LogTemp, Display, TEXT("particle"));
+					UGameplayStatics::SpawnEmitterAtLocation(this, VacuumParticles, OtherActorLocation, OtherActor->GetActorRotation());
+				}
+				else
+				{
+					UE_LOG(LogTemp, Display, TEXT("No particle"));
+				}
 				OtherActor->Destroy();
 			}
 		}
@@ -163,10 +169,7 @@ void UTP_WeaponComponent::PushBackCanceledVacuumedObjects()
 			UPrimitiveComponent* OtherActorPrimitiveComponent = OtherActor->FindComponentByClass<UPrimitiveComponent>();
 
 			if (OtherActorPrimitiveComponent)
-			{
-				OtherActorPrimitiveComponent->SetSimulatePhysics(true);
 				OtherActor->SetActorScale3D(FVector(1, 1, 1));
-			}
 		}
 	}
 }

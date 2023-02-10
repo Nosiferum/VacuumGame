@@ -3,3 +3,14 @@
 
 #include "VacuumAIController.h"
 
+#include "Kismet/GameplayStatics.h"
+
+void AVacuumAIController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+
+	SetFocus(PlayerPawn);
+	MoveToActor(PlayerPawn);
+}
