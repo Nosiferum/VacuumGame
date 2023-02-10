@@ -92,5 +92,6 @@ private:
 	UWorld* World;
 	FVector Start;
 	FVector End;
-	TArray<AActor*> Ammo;
+	UAnimInstance* AnimationInstance;
+	TArray<AActor*> Ammo = TArray<AActor*>();
 };

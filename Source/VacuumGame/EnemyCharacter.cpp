@@ -47,7 +47,7 @@ void AEnemyCharacter::HandleHitFX()
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
 
 	if (HitSound)
-		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation(), 0.8f);
 }
 
 void AEnemyCharacter::HandleDeath()

@@ -37,13 +37,13 @@ private:
 	void HandleDeath();
 
 private:
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Combat FX")
 	UParticleSystem* DeathParticles;
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Combat FX")
 	UParticleSystem* HitParticles;
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Combat FX")
 	USoundBase* DeathSound;
-	UPROPERTY(EditAnywhere, Category="Combat")
+	UPROPERTY(EditAnywhere, Category="Combat FX")
 	USoundBase* HitSound;
 
 	class UHealthComponent* HealthComponent;

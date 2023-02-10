@@ -104,14 +104,8 @@ void UTP_WeaponComponent::Vacuum()
 				Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
 				
 				if (VacuumParticles)
-				{
-					UE_LOG(LogTemp, Display, TEXT("particle"));
 					UGameplayStatics::SpawnEmitterAtLocation(this, VacuumParticles, OtherActorLocation, OtherActor->GetActorRotation());
-				}
-				else
-				{
-					UE_LOG(LogTemp, Display, TEXT("No particle"));
-				}
+				
 				OtherActor->Destroy();
 			}
 		}
@@ -148,8 +142,21 @@ void UTP_WeaponComponent::VacuumFire()
 			UStaticMeshComponent* StaticMeshComponent = SpawnedActor->FindComponentByClass<UStaticMeshComponent>();
 
 			if (StaticMeshComponent)
+			{
 				StaticMeshComponent->AddImpulse(
 					SpawnedActor->GetActorForwardVector() * ProjectileImpulseCoefficient * StaticMeshComponent->GetMass());
+
+				if (FireSound)
+					UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation(), 0.4f);
+
+				if (FireAnimation)
+				{
+					 AnimationInstance = Character->GetMesh1P()->GetAnimInstance();
+					
+					if (AnimationInstance)
+						AnimationInstance->Montage_Play(FireAnimation, 1.f);
+				}
+			}
 		}
 	}
 }
