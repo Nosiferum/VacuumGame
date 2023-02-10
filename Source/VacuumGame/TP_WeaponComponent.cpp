@@ -81,7 +81,7 @@ void UTP_WeaponComponent::Vacuum()
 			FVector MuzzleLocation = Start + FVector(0, 0, 10.f) + GetRightVector() * 50.f;
 
 			float Distance = FVector::Dist(OtherActorLocation, MuzzleLocation);
-			
+
 			FVector NewVacuumLocation = FMath::VInterpTo(OtherActorLocation, MuzzleLocation,
 			                                             UGameplayStatics::GetWorldDeltaSeconds(this),
 			                                             InterpolationSpeed);
@@ -102,10 +102,11 @@ void UTP_WeaponComponent::Vacuum()
 			{
 				Ammo.Add(OtherActor);
 				Character->OnAmmoChanged.ExecuteIfBound(Ammo.Num());
-				
+
 				if (VacuumParticles)
-					UGameplayStatics::SpawnEmitterAtLocation(this, VacuumParticles, OtherActorLocation, OtherActor->GetActorRotation());
-				
+					UGameplayStatics::SpawnEmitterAtLocation(this, VacuumParticles, OtherActorLocation,
+					                                         OtherActor->GetActorRotation());
+
 				OtherActor->Destroy();
 			}
 		}
@@ -144,15 +145,16 @@ void UTP_WeaponComponent::VacuumFire()
 			if (StaticMeshComponent)
 			{
 				StaticMeshComponent->AddImpulse(
-					SpawnedActor->GetActorForwardVector() * ProjectileImpulseCoefficient * StaticMeshComponent->GetMass());
+					SpawnedActor->GetActorForwardVector() * ProjectileImpulseCoefficient * StaticMeshComponent->
+					GetMass());
 
 				if (FireSound)
 					UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation(), 0.4f);
 
 				if (FireAnimation)
 				{
-					 AnimationInstance = Character->GetMesh1P()->GetAnimInstance();
-					
+					AnimationInstance = Character->GetMesh1P()->GetAnimInstance();
+
 					if (AnimationInstance)
 						AnimationInstance->Montage_Play(FireAnimation, 1.f);
 				}

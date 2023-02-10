@@ -12,9 +12,9 @@ AVacuumableObject::AVacuumableObject()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh"));
-	
+
 	SetRootComponent(StaticMeshComponent);
 }
 
@@ -48,4 +48,3 @@ void AVacuumableObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-

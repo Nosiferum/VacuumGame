@@ -28,26 +28,25 @@ void UHealthComponent::BeginPlay()
 }
 
 // Called every frame
-void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                     FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
 void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
-	AController* Instigator, AActor* DamageCauser)
+                                   AController* Instigator, AActor* DamageCauser)
 {
 	if (Damage <= 0.f) return;
 
 	Health -= Damage;
-	
+
 	if (EnemyCharacter)
 		EnemyCharacter->OnHealthChanged();
-	
+
 	if (Health <= 0.f)
 	{
 		OnActorDied.Broadcast();
 		Owner->Destroy();
 	}
 }
-
-

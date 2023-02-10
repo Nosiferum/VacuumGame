@@ -9,8 +9,7 @@ void AVacuumAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 
 	SetFocus(PlayerPawn);
-	MoveToActor(PlayerPawn);
 }

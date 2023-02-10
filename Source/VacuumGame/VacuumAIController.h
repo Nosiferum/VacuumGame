@@ -16,4 +16,7 @@ class VACUUMGAME_API AVacuumAIController : public AAIController
 
 protected:
 	virtual void BeginPlay() override;
+
+private:
+	APawn* PlayerPawn;
 };
