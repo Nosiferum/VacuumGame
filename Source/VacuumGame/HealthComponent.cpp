@@ -39,6 +39,7 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 {
 	if (Damage <= 0.f) return;
 
+	Damage = FMath::Min(Health, Damage);
 	Health -= Damage;
 
 	if (EnemyCharacter)
